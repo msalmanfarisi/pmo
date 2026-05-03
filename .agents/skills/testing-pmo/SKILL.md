@@ -49,6 +49,38 @@ Test in this order for a complete lifecycle:
 12. **SMTP Settings** — Go to `/settings/smtp`. Verify form fields (mailer, host, port, encryption, etc.)
 13. **Security Headers** — Use `curl -s -D - -o /dev/null http://localhost:8000/login` and verify CSP, HSTS, X-Frame-Options, X-Content-Type-Options headers
 
+## Notification Bell (top bar)
+
+- Bell icon in top-right corner
+- Click to open dropdown with "Notifications" header
+- "Mark all as unread" / "Mark all as read" toggle
+- Red badge appears when unread notifications exist
+- Note: If testing toggle, you may need to seed notifications first via `php artisan tinker`
+
+## User Profile Dropdown (top bar)
+
+- Click "System Administrator" text with SA avatar
+- Shows: Update Profile, Change Password, Sign Out (red text)
+- No standalone logout icon should exist outside the dropdown
+- Update Profile → `/profile` (name + email pre-filled)
+- Change Password → `/profile/password` (3 password fields)
+
+## Gantt Chart Views
+
+- Navigate to `/projects/{id}/gantt`
+- Three view modes: Daily, Weekly, Monthly
+- Monthly is the default active view (blue button)
+- **Daily view:** Individual day columns; Saturday/Sunday columns have `bg-red-50` background and `text-red-500` text color
+- **Weekly view:** Shows week ranges like "6-12", "13-19" grouped by month
+- **Monthly view:** Shows month columns like "Jan 2025", "Feb 2025"
+- Weekend verification can be done programmatically via browser console to check CSS classes
+
+## CSP Notes
+
+- The app uses strict Content Security Policy with nonce-based script loading
+- Alpine.js v3 requires `'unsafe-eval'` in CSP script-src — this is expected
+- Inline onclick handlers are NOT used; all event listeners are attached via `addEventListener`
+
 ## Tips
 
 - CAPTCHA is case-sensitive and expires after 5 minutes. Read the displayed code carefully before typing
@@ -58,6 +90,12 @@ Test in this order for a complete lifecycle:
 - `X-Powered-By` header may be exposed by PHP runtime — this requires `expose_php = Off` in `php.ini`, not an app-level fix
 - Kanban drag-and-drop uses SortableJS — testing drag events via browser automation may be unreliable; visual column verification is sufficient
 - The app uses Spatie Permission for RBAC. Roles: admin, manager, member, viewer
+
+## Common Issues
+
+- **Session expiration:** If redirected to login, re-authenticate with CAPTCHA
+- **Alpine.js dropdowns not working:** Check browser console for CSP errors. The `'unsafe-eval'` directive must be present in script-src
+- **Gantt view buttons not responding:** Ensure JavaScript event listeners are loaded (check for CSP blocking)
 
 ## Devin Secrets Needed
 
